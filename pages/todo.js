@@ -1,76 +1,94 @@
 import {useState} from 'react'
+import {useEffect} from 'react'
 import styles from '../styles/todo.module.css'
 
-const Todo = () => {
+const Todog = () => {
 
-    const [ tasks , setTasks ] = useState(
+    const [ dogs , setDogs ] = useState(
         [
-            {id:1, name: 'Reading a book'},
-            {id:2, name: 'Sleep at night'}
+            // {id:1, name: 'Reading a book'},
+            // {id:2, name: 'Sleep at night'}
         ])
     const [ name , setName] = useState('')
     const [idEdit , setIdEdit] = useState(0)
-       
-    const renderTask = () => {
-        return tasks.map( (task,index) => { 
+
+    useEffect( async () => {
+        let ts = await getDogs();
+        console.log(ts)
+        setDogs(ts) 
+    }, [] )
+    
+ 
+    const renderDog = () => {
+            
+        return dogs.map( (dog,index) => { 
                 return (<li key={index} className={styles.listItem}> 
+                {"No:"}
                 {index+1} 
-                {(+idEdit !== +task.id) ? task.name :
+                {" " + "Age:" + dog.age + " "}
+                {(+idEdit !== +dog.id) ? dog.name :
                     <input type="text" value={name} onChange={ (e) => setName(e.target.value) }/>
                 }
                 <div className = {styles.buttonContainer}>
-                    <button className={styles.button} onClick={() => editTask(task.id , task.name)}>Edit</button>
-                    <button className={styles.button} onClick={() => deleteTask(task.id)}> Delete</button>
+                    <button className={styles.button} onClick={() => editDog(dog.id , dog.name)}>Edit</button>
+                    <button className={styles.button} onClick={() => deleteDog(dog.id)}> Delete</button>
                 </div> 
                 </li>)
             }
          )
     }
    
-
-    const editTask = (id) => {
-        console.log('Edit Task')
+    const editDog = (id) => {
+        console.log('Edit Dog')
         setIdEdit(id)
-        let t = tasks.find((task) => +task.id === +id)
+        let t = dogs.find((dog) => +dog.id === +id)
         setName(t.name)
         if (+idEdit === +id) {
-            let newTasks = tasks.map((task,index) => {
-                if (+task.id === +id)
-                    tasks[index].name = name
-                return task
+            let newDogs = dogs.map((dog,index) => {
+                if (+dog.id === +id)
+                    dogs[index].name = name
+                return dog
             })
-            setTasks(newTasks)
+            setDogs(newDogs)
             setIdEdit(0)
         }
     }
     
 
-    const deleteTask = (id) => {
+    const deleteDog = (id) => {
         console.log('Delete');
-        let newTasks = tasks.filter( (task) => ( +task.id !== +id))
-        setTasks(newTasks)
+        let newDogs = dogs.filter( (dog) => ( +dog.id !== +id))
+        setDogs(newDogs)
     }
 
-    const addTask = (name) => {
+    const addDog = (name) => {
         console.log('ADD!!')
-        // tasks.push({id:3 , name:'xxx'})
-        const id = tasks[tasks.length-1].id+1
-        if(tasks.length<=9 && name.trim() != "")
-            setTasks([ ...tasks, {id, name}])
+        // dogs.push({id:3 , name:'xxx'})
+        const id = dogs[dogs.length-1].id+1
+        if(dogs.length<=9 && name.trim() != "")
+            setDogs([ ...dogs, {id, name}])
     }
+
+    const getDogs = async () => {
+        const res = await fetch('http://localhost:8000/')
+        const json = await res.json()
+        console.log(json)
+        return json;
+     }
+     
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.title}>Todo</h1>
+            <h1 className={styles.title}>Todog</h1>
             <input type = "text" onChange={(e)=>setName(e.target.value)}/>
-            <button onClick={()=> addTask(name)}>Add</button>
+            <button onClick={()=> addDog(name)}>Add</button>
             <ul className={styles.list}>
-                { renderTask() }
+                { renderDog() }
             </ul>
         </div>
         )
      
 }
 
-export default Todo
+export default Todog
  
